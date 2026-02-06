@@ -170,9 +170,64 @@
             <div class="cart-total">
                 Total: Rp <span id="cartTotal">0</span>
             </div>
-            <button class="btn" id="checkoutBtn">Lanjut ke Pembayaran</button>
         </div>
     </div>
+
+    <!-- Checkout Modal -->
+<div class="modal-overlay" id="checkoutModal">
+    <div class="modal checkout-modal">
+        <button class="close-modal" id="closeCheckoutModal">&times;</button>
+        <h2>Checkout Pesanan</h2>
+        <form id="checkoutForm">
+            <div class="form-group">
+                <label for="customerName">Nama Pemesan *</label>
+                <input type="text" id="customerName" required placeholder="Masukkan nama lengkap">
+            </div>
+            <div class="form-group">
+                <label for="customerPhone">Nomor WhatsApp *</label>
+                <input type="tel" id="customerPhone" required placeholder="Contoh: 081234567890">
+            </div>
+            <div class="form-group">
+                <label for="customerAddress">Alamat Pengiriman *</label>
+                <textarea id="customerAddress" required rows="3" placeholder="Masukkan alamat lengkap"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="paymentMethod">Metode Pembayaran *</label>
+                <select id="paymentMethod" required>
+                    <option value="" disabled selected>Pilih metode pembayaran</option>
+                    <option value="Transfer Bank">Transfer Bank (BCA/Mandiri/BNI)</option>
+                    <option value="E-Wallet">E-Wallet (Dana/Gopay/OVO)</option>
+                    <option value="COD">COD (Cash On Delivery)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="orderNotes">Catatan Pesanan (Opsional)</label>
+                <textarea id="orderNotes" rows="2" placeholder="Catatan untuk penjual"></textarea>
+            </div>
+            
+            <div class="order-summary">
+                <h3>Ringkasan Pesanan</h3>
+                <div class="summary-details">
+                    <div class="summary-item">
+                        <span>Total Item:</span>
+                        <span id="summaryTotalItems">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Harga:</span>
+                        <span id="summaryTotalPrice">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="button" class="btn btn-outline" id="backToCartBtn">Kembali ke Keranjang</button>
+                <button type="submit" class="btn btn-payment">
+                    <i class="fab fa-whatsapp"></i> Lanjut ke WhatsApp
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
     <script src="script.js"></script>
 </body>

@@ -91,7 +91,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 11,
+        id: 11,
         name: "0033 - Greendo",
         category: "formal - boy",
         price: 35000,
@@ -100,7 +100,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 12,
+        id: 12,
         name: "0092 - Blobrow",
         category: "formal - boy",
         price: 39000,
@@ -109,7 +109,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 13,
+        id: 13,
         name: "0072 - Blackie",
         category: "formal - boy",
         price: 30000,
@@ -118,7 +118,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 14,
+        id: 14,
         name: "0086 - Swag",
         category: "formal - boy",
         price: 36000,
@@ -127,7 +127,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 15,
+        id: 15,
         name: "0018 - Garyto",
         category: "formal - boy",
         price: 38000,
@@ -136,7 +136,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 16,
+        id: 16,
         name: "0056 - Sriga",
         category: "casual - boy",
         price: 35000,
@@ -145,7 +145,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 17,
+        id: 17,
         name: "0074 - Bluwie",
         category: "casual - boy",
         price: 37000,
@@ -154,7 +154,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 18,
+        id: 18,
         name: "0032 - Swige",
         category: "casual - boy",
         price: 35000,
@@ -163,7 +163,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 19,
+        id: 19,
         name: "0081 - Nakyu",
         category: "casual - boy",
         price: 36000,
@@ -172,7 +172,7 @@ const products = [
         stock: "ready"
     },
     {
-    id: 20,
+        id: 20,
         name: "0032 - Grumpy",
         category: "casual - boy",
         price: 36000,
@@ -180,13 +180,22 @@ const products = [
         description: "topi berwarna cream dengan tulisan New York di depannya.",
         stock: "ready"
     },
-
 ];
 
 // Cart functionality
 let cart = [];
 let cartCount = 0;
 let cartTotal = 0;
+
+// WhatsApp configuration
+const whatsappNumber = "6282139868141"; // Ganti dengan nomor WhatsApp Anda
+
+// Social links
+const socialLinks = {
+    instagram: "https://www.instagram.com/headspace11_?igsh=MXNmemV3dWM1YzN4cA==",
+    whatsapp: "https://wa.me/6282139868141",
+    tiktok: "https://www.tiktok.com/@headspace11_?_r=1&_t=ZS-93F8Ef0AjD"
+};
 
 // DOM elements
 const productGrid = document.getElementById('productGrid');
@@ -205,14 +214,13 @@ const totalProductsElement = document.getElementById('totalProducts');
 const readyStockElement = document.getElementById('readyStock');
 const soldOutElement = document.getElementById('soldOut');
 
-// Social links - GANTI DENGAN LINK ANDA
-const socialLinks = {
-    instagram: "https://www.instagram.com/headspace11_?igsh=MXNmemV3dWM1YzN4cA==",
-    whatsapp: "https://wa.me/6282139868141",
-    tiktok: "https://www.tiktok.com/@headspace11_?_r=1&_t=ZS-93F8Ef0AjD"
-};
-
-const paymentLink = "https://docs.google.com/forms/d/e/1FAIpQLSf6WKdiat8oTxqJTTJCJm-axdxk1XIFpPujiaPYZve-AC57Gw/viewform"; // GANTI DENGAN LINK PEMBAYARAN ANDA
+// DOM elements untuk checkout modal
+const checkoutModal = document.getElementById('checkoutModal');
+const closeCheckoutModal = document.getElementById('closeCheckoutModal');
+const checkoutForm = document.getElementById('checkoutForm');
+const backToCartBtn = document.getElementById('backToCartBtn');
+const summaryTotalItems = document.getElementById('summaryTotalItems');
+const summaryTotalPrice = document.getElementById('summaryTotalPrice');
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
@@ -220,10 +228,16 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCartCount();
     updateStockSummary();
     
-    // Event listeners
+    // Event listeners untuk cart
     cartIcon.addEventListener('click', openCartModal);
     closeModal.addEventListener('click', closeCartModal);
-    checkoutBtn.addEventListener('click', goToPayment);
+    
+    // Event listeners untuk checkout modal
+    closeCheckoutModal.addEventListener('click', closeCheckoutModalHandler);
+    checkoutForm.addEventListener('submit', submitCheckoutForm);
+    backToCartBtn.addEventListener('click', backToCartHandler);
+    
+    // Event listeners untuk filter
     categoryFilter.addEventListener('change', filterProducts);
     priceFilter.addEventListener('change', filterProducts);
     stockFilter.addEventListener('change', filterProducts);
@@ -233,6 +247,12 @@ document.addEventListener('DOMContentLoaded', function() {
     cartModal.addEventListener('click', function(e) {
         if (e.target === cartModal) {
             closeCartModal();
+        }
+    });
+    
+    checkoutModal.addEventListener('click', function(e) {
+        if (e.target === checkoutModal) {
+            closeCheckoutModalHandler();
         }
     });
     
@@ -274,7 +294,7 @@ function renderProducts(productsToRender) {
         // Check if product is in cart
         const cartItem = cart.find(item => item.id === product.id);
         const quantityInCart = cartItem ? cartItem.quantity : 0;
-        const displayQuantity = quantityInCart > 0 ? quantityInCart : 1;
+        const displayQuantity = quantityInCart > 0 ? quantityInCart : 0;
         
         // Sold out badge
         const soldOutBadge = product.stock === 'soldout' ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
@@ -284,7 +304,22 @@ function renderProducts(productsToRender) {
         if (product.stock === 'soldout') {
             actionButtons = '<button class="btn-disabled" disabled>Stok Habis</button>';
         } else {
-            // Show quantity controls and add/update button
+            // Determine button text based on cart status
+            let buttonHTML = '';
+            if (quantityInCart > 0) {
+                buttonHTML = `
+                    <button class="btn btn-update" onclick="updateCartItem(${product.id})">
+                        <i class="fas fa-sync-alt"></i> Update
+                    </button>
+                `;
+            } else {
+                buttonHTML = `
+                    <button class="btn" onclick="addToCart(${product.id})">
+                        <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
+                    </button>
+                `;
+            }
+            
             actionButtons = `
                 <div class="quantity-control-wrapper">
                     <div class="quantity-control">
@@ -294,14 +329,7 @@ function renderProducts(productsToRender) {
                         <button class="qty-plus" onclick="changeQuantity(${product.id}, 1)">+</button>
                     </div>
                     <div class="add-to-cart-container">
-                        ${quantityInCart > 0 ? 
-                            `<button class="btn btn-update" onclick="updateCartItem(${product.id})">
-                                <i class="fas fa-sync-alt"></i> Update
-                            </button>` : 
-                            `<button class="btn" onclick="addToCart(${product.id})">
-                                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
-                            </button>`
-                        }
+                        ${buttonHTML}
                     </div>
                 </div>
                 <button class="btn btn-outline" onclick="viewDetails(${product.id})">Detail</button>
@@ -376,9 +404,9 @@ function filterProducts() {
     // Filter by price
     if (selectedPrice !== 'all') {
         filteredProducts = filteredProducts.filter(product => {
-            if (selectedPrice === 'low') return product.price <= 150000;
-            if (selectedPrice === 'medium') return product.price > 150000 && product.price <= 300000;
-            if (selectedPrice === 'high') return product.price > 300000;
+            if (selectedPrice === 'low') return product.price <= 30000;
+            if (selectedPrice === 'medium') return product.price > 30000 && product.price <= 40000;
+            if (selectedPrice === 'high') return product.price > 40000;
             return true;
         });
     }
@@ -433,33 +461,42 @@ function validateQuantityInput(productId) {
 function updateAddButton(productId) {
     const cartItem = cart.find(item => item.id === productId);
     const qtyInput = document.getElementById(`qty-${productId}`);
-    const quantity = parseInt(qtyInput.value) || 1;
     
-    // Find the add button container
+    if (!qtyInput) return; // Jika input tidak ditemukan (produk difilter)
+    
+    const quantity = parseInt(qtyInput.value) || 1;
     const productCard = qtyInput.closest('.product-card');
+    
     if (!productCard) return;
     
     const addButtonContainer = productCard.querySelector('.add-to-cart-container');
     if (!addButtonContainer) return;
     
-    if (cartItem && cartItem.quantity === quantity) {
-        // Quantity hasn't changed
-        addButtonContainer.innerHTML = `
-            <button class="btn btn-in-cart">
-                <i class="fas fa-check"></i> Di Keranjang
-            </button>
-        `;
-    } else if (cartItem) {
-        // Quantity changed, show update button
-        addButtonContainer.innerHTML = `
-            <button class="btn btn-update" onclick="updateCartItem(${productId})">
-                <i class="fas fa-sync-alt"></i> Update
-            </button>
-        `;
+    // Cari produk data
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    if (cartItem) {
+        // Produk ada di keranjang
+        if (cartItem.quantity === quantity) {
+            // Quantity sama, tampilkan "Di Keranjang"
+            addButtonContainer.innerHTML = `
+                <button class="btn btn-in-cart">
+                    <i class="fas fa-check"></i> Di Keranjang
+                </button>
+            `;
+        } else {
+            // Quantity berbeda, tampilkan "Update"
+            addButtonContainer.innerHTML = `
+                <button class="btn btn-update" onclick="updateCartItem(${productId})">
+                    <i class="fas fa-sync-alt"></i> Update
+                </button>
+            `;
+        }
     } else {
-        // Not in cart, show add button
+        // Produk tidak ada di keranjang
         addButtonContainer.innerHTML = `
-            <button class="btn" onclick="addToCart(${product.id})">
+            <button class="btn" onclick="addToCart(${productId})">
                 <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
             </button>
         `;
@@ -518,7 +555,6 @@ function updateCartItem(productId) {
 }
 
 // Remove from cart
-// Update fungsi removeFromCart
 function removeFromCart(productId) {
     const productName = cart.find(item => item.id === productId)?.name || '';
     cart = cart.filter(item => item.id !== productId);
@@ -531,39 +567,7 @@ function removeFromCart(productId) {
     showNotification(`${productName} dihapus dari keranjang`, 'success');
 }
 
-// Update fungsi adjustCartItemQuantity - tambahkan reset jika quantity jadi 0
-function adjustCartItemQuantity(productId, change) {
-    const itemIndex = cart.findIndex(item => item.id === productId);
-    
-    if (itemIndex === -1) return;
-    
-    const newQuantity = cart[itemIndex].quantity + change;
-    
-    if (newQuantity < 1) {
-        removeFromCart(productId);
-        return;
-    }
-    
-    if (newQuantity > 99) {
-        showNotification('Maksimal 99 item per produk', 'error');
-        return;
-    }
-    
-    cart[itemIndex].quantity = newQuantity;
-    updateCartCount();
-    renderCartItems();
-    
-    // Update product card
-    const qtyInput = document.getElementById(`qty-${productId}`);
-    if (qtyInput) {
-        qtyInput.value = newQuantity;
-        updateAddButton(productId);
-    }
-    
-    showNotification(`Jumlah ${cart[itemIndex].name} diperbarui: ${newQuantity} pcs`, 'success');
-}
-
-// Fungsi baru untuk reset UI produk
+// Reset product card UI
 function resetProductCardUI(productId) {
     const qtyInput = document.getElementById(`qty-${productId}`);
     
@@ -589,179 +593,6 @@ function resetProductCardUI(productId) {
             <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
         </button>
     `;
-}
-
-// Update fungsi filterProducts untuk reset UI yang benar
-function filterProducts() {
-    const selectedCategory = categoryFilter.value;
-    const selectedPrice = priceFilter.value;
-    const selectedStock = stockFilter.value;
-    const searchTerm = searchInput.value.toLowerCase();
-    
-    let filteredProducts = products;
-    
-    // Filter by category
-    if (selectedCategory !== 'all') {
-        filteredProducts = filteredProducts.filter(product => product.category === selectedCategory);
-    }
-    
-    // Filter by price
-    if (selectedPrice !== 'all') {
-        filteredProducts = filteredProducts.filter(product => {
-            if (selectedPrice === 'low') return product.price <= 150000;
-            if (selectedPrice === 'medium') return product.price > 150000 && product.price <= 300000;
-            if (selectedPrice === 'high') return product.price > 300000;
-            return true;
-        });
-    }
-    
-    // Filter by stock
-    if (selectedStock !== 'all') {
-        filteredProducts = filteredProducts.filter(product => product.stock === selectedStock);
-    }
-    
-    // Filter by search term
-    if (searchTerm) {
-        filteredProducts = filteredProducts.filter(product => 
-            product.name.toLowerCase().includes(searchTerm) || 
-            product.description.toLowerCase().includes(searchTerm)
-        );
-    }
-    
-    renderProducts(filteredProducts);
-}
-
-// Update fungsi renderProducts untuk menangani produk yang tidak ditampilkan
-function renderProducts(productsToRender) {
-    productGrid.innerHTML = '';
-    
-    if (productsToRender.length === 0) {
-        productGrid.innerHTML = '<p class="no-products">Tidak ada produk yang sesuai dengan filter.</p>';
-        return;
-    }
-    
-    productsToRender.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        
-        // Check if product is in cart
-        const cartItem = cart.find(item => item.id === product.id);
-        const quantityInCart = cartItem ? cartItem.quantity : 0;
-        const displayQuantity = quantityInCart > 0 ? quantityInCart : 1;
-        
-        // Sold out badge
-        const soldOutBadge = product.stock === 'soldout' ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
-        
-        // Action buttons based on stock
-        let actionButtons = '';
-        if (product.stock === 'soldout') {
-            actionButtons = '<button class="btn-disabled" disabled>Stok Habis</button>';
-        } else {
-            // Determine button text based on cart status
-            let buttonHTML = '';
-            if (quantityInCart > 0) {
-                buttonHTML = `
-                    <button class="btn btn-update" onclick="updateCartItem(${product.id})">
-                        <i class="fas fa-sync-alt"></i> Update
-                    </button>
-                `;
-            } else {
-                buttonHTML = `
-                    <button class="btn" onclick="addToCart(${product.id})">
-                        <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
-                    </button>
-                `;
-            }
-            
-            actionButtons = `
-                <div class="quantity-control-wrapper">
-                    <div class="quantity-control">
-                        <button class="qty-minus" onclick="changeQuantity(${product.id}, -1)">-</button>
-                        <input type="number" class="qty-input" id="qty-${product.id}" 
-                               value="${displayQuantity}" min="1" max="99">
-                        <button class="qty-plus" onclick="changeQuantity(${product.id}, 1)">+</button>
-                    </div>
-                    <div class="add-to-cart-container">
-                        ${buttonHTML}
-                    </div>
-                </div>
-                <button class="btn btn-outline" onclick="viewDetails(${product.id})">Detail</button>
-            `;
-        }
-        
-        productCard.innerHTML = `
-            ${soldOutBadge}
-            <img src="${product.image}" alt="${product.name}" class="product-image">
-            <div class="product-info">
-                <h3 class="product-title">${product.name}</h3>
-                <span class="product-category">${getCategoryName(product.category)}</span>
-                <div class="product-price">Rp ${product.price.toLocaleString('id-ID')}</div>
-                <div class="product-stock ${product.stock === 'ready' ? 'stock-ready' : 'stock-soldout'}">
-                    <i class="fas ${product.stock === 'ready' ? 'fa-check-circle' : 'fa-times-circle'} stock-icon"></i>
-                    ${product.stock === 'ready' ? 'Ready Stock' : 'Sold Out'}
-                </div>
-                <p class="product-description">${product.description}</p>
-                <div class="product-actions">
-                    ${actionButtons}
-                </div>
-            </div>
-        `;
-        productGrid.appendChild(productCard);
-        
-        // Add input change event
-        if (product.stock === 'ready') {
-            const qtyInput = document.getElementById(`qty-${product.id}`);
-            qtyInput.addEventListener('change', function() {
-                validateQuantityInput(product.id);
-            });
-        }
-    });
-}
-
-// Update fungsi updateAddButton untuk lebih sederhana
-function updateAddButton(productId) {
-    const cartItem = cart.find(item => item.id === productId);
-    const qtyInput = document.getElementById(`qty-${productId}`);
-    
-    if (!qtyInput) return; // Jika input tidak ditemukan (produk difilter)
-    
-    const quantity = parseInt(qtyInput.value) || 1;
-    const productCard = qtyInput.closest('.product-card');
-    
-    if (!productCard) return;
-    
-    const addButtonContainer = productCard.querySelector('.add-to-cart-container');
-    if (!addButtonContainer) return;
-    
-    // Cari produk data
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    
-    if (cartItem) {
-        // Produk ada di keranjang
-        if (cartItem.quantity === quantity) {
-            // Quantity sama, tampilkan "Di Keranjang"
-            addButtonContainer.innerHTML = `
-                <button class="btn btn-in-cart">
-                    <i class="fas fa-check"></i> Di Keranjang
-                </button>
-            `;
-        } else {
-            // Quantity berbeda, tampilkan "Update"
-            addButtonContainer.innerHTML = `
-                <button class="btn btn-update" onclick="updateCartItem(${productId})">
-                    <i class="fas fa-sync-alt"></i> Update
-                </button>
-            `;
-        }
-    } else {
-        // Produk tidak ada di keranjang
-        addButtonContainer.innerHTML = `
-            <button class="btn" onclick="addToCart(${productId})">
-                <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
-            </button>
-        `;
-    }
 }
 
 // Update cart count
@@ -822,15 +653,15 @@ function renderCartItems() {
     // Update cart total
     cartTotalElement.textContent = cartTotal.toLocaleString('id-ID');
     
-    // Add continue payment button
-    const continuePaymentDiv = document.createElement('div');
-    continuePaymentDiv.className = 'continue-payment-container';
-    continuePaymentDiv.innerHTML = `
-        <a href="${paymentLink}" class="btn btn-payment" target="_blank" onclick="closeCartModal()">
-            <i class="fas fa-credit-card"></i> Lanjutkan Pembayaran
-        </a>
+    // Add checkout button
+    const checkoutButtonDiv = document.createElement('div');
+    checkoutButtonDiv.className = 'continue-payment-container';
+    checkoutButtonDiv.innerHTML = `
+        <button class="btn btn-payment" onclick="goToPayment()">
+            <i class="fas fa-credit-card"></i> Lanjutkan ke Checkout
+        </button>
     `;
-    cartItems.appendChild(continuePaymentDiv);
+    cartItems.appendChild(checkoutButtonDiv);
 }
 
 // Adjust cart item quantity
@@ -865,15 +696,176 @@ function adjustCartItemQuantity(productId, change) {
     showNotification(`Jumlah ${cart[itemIndex].name} diperbarui: ${newQuantity} pcs`, 'success');
 }
 
-// Go to payment
+// Fungsi untuk membuka modal checkout
 function goToPayment() {
     if (cart.length === 0) {
         showNotification('Keranjang belanja Anda masih kosong!', 'error');
         return;
     }
     
-    // Open payment link in new tab
-    window.open(paymentLink, '_blank');
+    // Buka modal checkout
+    openCheckoutModal();
+}
+
+// Fungsi untuk membuka modal checkout
+function openCheckoutModal() {
+    if (cart.length === 0) {
+        showNotification('Keranjang belanja Anda masih kosong!', 'error');
+        return;
+    }
+    
+    updateOrderSummary();
+    checkoutModal.classList.add('active');
+}
+
+// Fungsi untuk menutup modal checkout
+function closeCheckoutModalHandler() {
+    checkoutModal.classList.remove('active');
+}
+
+// Fungsi untuk kembali ke keranjang
+function backToCartHandler() {
+    closeCheckoutModalHandler();
+    openCartModal();
+}
+
+// Fungsi untuk update ringkasan pesanan
+function updateOrderSummary() {
+    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+    const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    
+    summaryTotalItems.textContent = totalItems;
+    summaryTotalPrice.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+}
+
+// Fungsi untuk mengirim pesanan ke WhatsApp
+function submitCheckoutForm(e) {
+    e.preventDefault();
+    
+    if (cart.length === 0) {
+        showNotification('Keranjang belanja Anda masih kosong!', 'error');
+        return;
+    }
+    
+    // Ambil data dari form
+    const customerName = document.getElementById('customerName').value;
+    const customerPhone = document.getElementById('customerPhone').value;
+    const customerAddress = document.getElementById('customerAddress').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const orderNotes = document.getElementById('orderNotes').value;
+    
+    // Validasi form
+    if (!customerName || !customerPhone || !customerAddress || !paymentMethod) {
+        showNotification('Harap lengkapi semua data yang diperlukan!', 'error');
+        return;
+    }
+    
+    // Format nomor telepon (hapus awalan 0 jika ada, tambahkan 62)
+    const formattedPhone = formatPhoneNumber(customerPhone);
+    
+    // Buat pesan WhatsApp
+    const whatsappMessage = generateWhatsAppMessage(
+        customerName,
+        formattedPhone,
+        customerAddress,
+        paymentMethod,
+        orderNotes
+    );
+    
+    // Encode pesan untuk URL
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    
+    // Buat URL WhatsApp
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    
+    // Reset form
+    checkoutForm.reset();
+    
+    // Tutup modal
+    closeCheckoutModalHandler();
+    closeCartModal();
+    
+    // Kosongkan keranjang
+    cart = [];
+    updateCartCount();
+    renderCartItems();
+    
+    // Render ulang produk untuk reset quantity controls
+    renderProducts(products);
+    
+    // Buka WhatsApp di tab baru
+    window.open(whatsappURL, '_blank');
+    
+    // Tampilkan notifikasi
+    showNotification('Pesanan Anda sedang diproses! WhatsApp akan terbuka.', 'success');
+}
+
+// Fungsi untuk memformat nomor telepon
+function formatPhoneNumber(phone) {
+    // Hapus semua karakter non-digit
+    let cleaned = phone.replace(/\D/g, '');
+    
+    // Jika diawali dengan 0, ganti dengan 62
+    if (cleaned.startsWith('0')) {
+        cleaned = '62' + cleaned.substring(1);
+    }
+    
+    // Jika diawali dengan +62, hapus +
+    if (cleaned.startsWith('+62')) {
+        cleaned = cleaned.substring(1);
+    }
+    
+    // Jika tidak diawali dengan 62, tambahkan
+    if (!cleaned.startsWith('62')) {
+        cleaned = '62' + cleaned;
+    }
+    
+    return cleaned;
+}
+
+// Fungsi untuk generate pesan WhatsApp
+function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
+    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+    const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const orderDate = new Date().toLocaleDateString('id-ID', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    let message = `PESANAN DARI WEBSITE HEADSPACE\n\n`;
+    message += `*DATA PEMESAN:*\n`;
+    message += `- Nama: ${name}\n`;
+    message += `- WhatsApp: ${phone}\n`;
+    message += `- Alamat: ${address}\n\n`;
+    
+    message += `DETAIL PESANAN:\n`;
+    message += `═══════════════════════════\n`;
+    cart.forEach((item, index) => {
+        message += `${index + 1}. *${item.name}*\n`;
+        message += `   ├ Kategori: ${getCategoryName(item.category)}\n`;
+        message += `   ├ Harga: Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}\n`;
+        message += `   └ Subtotal: Rp ${(item.price * item.quantity).toLocaleString('id-ID')}\n\n`;
+    });
+    message += `═══════════════════════════\n\n`;
+    
+    message += `RINCIAN PEMBAYARAN:\n`;
+    message += `- Total Item: ${totalItems} pcs\n`;
+    message += `- Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n`;
+    message += `- Metode Bayar: ${paymentMethod}\n\n`;
+    
+    if (notes) {
+        message += `CATATAN PESANAN:\n${notes}\n\n`;
+    }
+    
+    message += `- Waktu Pesan: ${orderDate}\n`;
+    message += `\n_Saya sudah memesan dari website HeadSpace dan ingin melanjutkan pembayaran._\n`;
+    message += `\nTerima kasih!`;
+    
+    return message;
 }
 
 // View details
