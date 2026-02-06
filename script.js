@@ -188,7 +188,7 @@ let cartCount = 0;
 let cartTotal = 0;
 
 // WhatsApp configuration
-const whatsappNumber = "6282139868141"; // Ganti dengan nomor WhatsApp Anda
+const whatsappNumber = "6282139868141";
 
 // Social links
 const socialLinks = {
@@ -878,29 +878,29 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
         minute: '2-digit'
     });
     
-    let message = `PESANAN DARI WEBSITE HEADSPACE\n\n`;
+    let message = `*PESANAN DARI WEBSITE HEADSPACE*\n\n`;
     message += `*DATA PEMESAN:*\n`;
     message += `- Nama: ${name}\n`;
     message += `- WhatsApp: ${phone}\n`;
     message += `- Alamat: ${address}\n\n`;
     
-    message += `DETAIL PESANAN:\n`;
-    message += `═══════════════════════════\n`;
+    message += `*DETAIL PESANAN:*\n`;
+    message += `═════════════════════════\n`;
     cart.forEach((item, index) => {
         message += `${index + 1}. *${item.name}*\n`;
         message += `   ├ Kategori: ${getCategoryName(item.category)}\n`;
         message += `   ├ Harga: Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}\n`;
         message += `   └ Subtotal: Rp ${(item.price * item.quantity).toLocaleString('id-ID')}\n\n`;
     });
-    message += `═══════════════════════════\n\n`;
+    message += `══════════════════════════\n\n`;
     
-    message += `RINCIAN PEMBAYARAN:\n`;
+    message += `*RINCIAN PEMBAYARAN:*\n`;
     message += `- Total Item: ${totalItems} pcs\n`;
     message += `- Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n`;
     message += `- Metode Bayar: ${paymentMethod}\n\n`;
     
     if (notes) {
-        message += `CATATAN PESANAN:\n${notes}\n\n`;
+        message += `*CATATAN PESANAN:*\n${notes}\n\n`;
     }
     
     message += `- Waktu Pesan: ${orderDate}\n`;

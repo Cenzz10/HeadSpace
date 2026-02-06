@@ -766,7 +766,6 @@ footer {
     box-shadow: var(--shadow);
     border: 1px solid #e2e8f0;
 }
-/* Tambahkan CSS berikut di akhir file style.css */
 
 /* Styling untuk tombol quantity controls */
 .quantity-controls {
@@ -996,10 +995,6 @@ footer {
     }
     
 }
-
-/* ============================================= */
-/* FITUR TAMBAH/KURANG SEBELUM MASUK KERANJANG */
-/* ============================================= */
 
 /* Quantity controls wrapper */
 .quantity-control-wrapper {
