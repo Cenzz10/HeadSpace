@@ -430,10 +430,10 @@ function filterProducts() {
 // Change quantity with + or - buttons
 function changeQuantity(productId, change) {
     const qtyInput = document.getElementById(`qty-${productId}`);
-    let currentValue = parseInt(qtyInput.value) || 1;
+    let currentValue = parseInt(qtyInput.value) || 0;
     let newValue = currentValue + change;
     
-    if (newValue < 1) newValue = 1;
+    if (newValue < 0) newValue = 0;
     if (newValue > 99) newValue = 99;
     
     qtyInput.value = newValue;
@@ -464,9 +464,10 @@ function updateAddButton(productId) {
     
     if (!qtyInput) return; // Jika input tidak ditemukan (produk difilter)
     
-    const quantity = parseInt(qtyInput.value) || 1;
-    const productCard = qtyInput.closest('.product-card');
+    const quantity = parseInt(qtyInput.value);
+    const currentQuantity = isNaN(quantity) ? 0 : quantity;
     
+    const productCard = qtyInput.closest('.product-card');
     if (!productCard) return;
     
     const addButtonContainer = productCard.querySelector('.add-to-cart-container');
@@ -503,32 +504,72 @@ function updateAddButton(productId) {
     }
 }
 
-// Add to cart
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     const qtyInput = document.getElementById(`qty-${productId}`);
-    const quantity = parseInt(qtyInput.value) || 1;
+    const quantity = parseInt(qtyInput.value);
+    
+    // Validasi: quantity harus angka dan > 0
+    if (isNaN(quantity) || quantity <= 0) {
+        showNotification('Quantity harus lebih dari 0!', 'error');
+        
+        // Reset ke 0 jika negatif
+        if (quantity < 0 || isNaN(quantity)) {
+            qtyInput.value = 0;
+            updateAddButton(productId);
+        }
+        
+        return;
+    }
     
     if (!product || product.stock !== 'ready') {
         showNotification('Produk tidak tersedia!', 'error');
         return;
     }
     
-    cart.push({
-        ...product,
-        quantity: quantity
-    });
+    // Cek apakah sudah ada di keranjang
+    const existingItemIndex = cart.findIndex(item => item.id === productId);
+    
+    if (existingItemIndex !== -1) {
+        // Jika sudah ada, update quantity
+        cart[existingItemIndex].quantity += quantity;
+        showNotification(`${product.name} ditambahkan ${quantity} pcs (Total: ${cart[existingItemIndex].quantity} pcs)`, 'success');
+    } else {
+        // Jika belum ada, tambahkan baru
+        cart.push({
+            ...product,
+            quantity: quantity
+        });
+        showNotification(`${product.name} (${quantity} pcs) ditambahkan ke keranjang!`, 'success');
+    }
     
     updateCartCount();
     updateAddButton(productId);
-    showNotification(`${product.name} (${quantity} pcs) ditambahkan ke keranjang!`, 'success');
+    renderCartItems();
 }
 
-// Update cart item
 function updateCartItem(productId) {
     const product = products.find(p => p.id === productId);
     const qtyInput = document.getElementById(`qty-${productId}`);
-    const quantity = parseInt(qtyInput.value) || 1;
+    const quantity = parseInt(qtyInput.value);
+    
+    // Validasi: jika quantity <= 0, hapus dari keranjang
+    if (isNaN(quantity) || quantity <= 0) {
+        // Hapus dari keranjang jika ada
+        const itemIndex = cart.findIndex(item => item.id === productId);
+        if (itemIndex !== -1) {
+            const productName = cart[itemIndex].name;
+            cart.splice(itemIndex, 1);
+            showNotification(`${productName} dihapus dari keranjang`, 'success');
+        } else {
+            showNotification('Quantity harus lebih dari 0!', 'error');
+        }
+        
+        updateCartCount();
+        updateAddButton(productId);
+        renderCartItems();
+        return;
+    }
     
     if (!product || product.stock !== 'ready') {
         showNotification('Produk tidak tersedia!', 'error');
@@ -538,15 +579,16 @@ function updateCartItem(productId) {
     const itemIndex = cart.findIndex(item => item.id === productId);
     
     if (itemIndex !== -1) {
-        if (quantity === 0) {
-            // Remove from cart
-            cart.splice(itemIndex, 1);
-            showNotification(`${product.name} dihapus dari keranjang`, 'success');
-        } else {
-            // Update quantity
-            cart[itemIndex].quantity = quantity;
-            showNotification(`${product.name} diperbarui menjadi ${quantity} pcs`, 'success');
-        }
+        // Update quantity yang ada
+        cart[itemIndex].quantity = quantity;
+        showNotification(`${product.name} diperbarui menjadi ${quantity} pcs`, 'success');
+    } else {
+        // Jika belum ada di keranjang dan quantity > 0, tambahkan
+        cart.push({
+            ...product,
+            quantity: quantity
+        });
+        showNotification(`${product.name} (${quantity} pcs) ditambahkan ke keranjang!`, 'success');
     }
     
     updateCartCount();
