@@ -294,7 +294,7 @@ function renderProducts(productsToRender) {
         // Check if product is in cart
         const cartItem = cart.find(item => item.id === product.id);
         const quantityInCart = cartItem ? cartItem.quantity : 0;
-        const displayQuantity = quantityInCart > 0 ? quantityInCart : 0;
+        const displayQuantity = quantityInCart;
         
         // Sold out badge
         const soldOutBadge = product.stock === 'soldout' ? '<div class="sold-out-badge">SOLD OUT</div>' : '';
