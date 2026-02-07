@@ -47,9 +47,9 @@
                     <label for="categoryFilter">Kategori</label>
                     <select id="categoryFilter">
                         <option value="all">Semua Kategori</option>
-                        <option value="casual - girl">Casual -Girl</option>
+                        <option value="casual - girl">Casual - Girl</option>
                         <option value="formal - girl">Formal - Girl</option>
-                        <option value="casual - boy">Casual -Boy</option>
+                        <option value="casual - boy">Casual - Boy</option>
                         <option value="formal - boy">Formal - Boy</option>
                     </select>
                 </div>
@@ -198,6 +198,30 @@
                     <option value="E-Wallet">E-Wallet (Dana/Gopay/OVO)</option>
                 </select>
             </div>
+            
+            <!-- QRIS Section (Hidden by default) -->
+            <div class="form-group qris-section" id="qrisSection" style="display: none;">
+                <label>QR Code Pembayaran</label>
+                <div class="qris-container">
+                    <img src="images/qris.jpeg">
+                    
+                </div>
+            </div>
+            
+            <!-- Payment Proof Upload -->
+            <div class="form-group">
+                <label for="paymentProof">Bukti Pembayaran *</label>
+                <div class="file-upload-container">
+                    <input type="file" id="paymentProof" accept="image/*,.pdf" required>
+                    <label for="paymentProof" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Unggah bukti pembayaran</span>
+                        <p class="file-upload-hint">Format: JPG, PNG, atau PDF (Maks. 5MB)</p>
+                    </label>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+            </div>
+            
             <div class="form-group">
                 <label for="orderNotes">Catatan Pesanan (Opsional)</label>
                 <textarea id="orderNotes" rows="2" placeholder="Catatan untuk penjual"></textarea>

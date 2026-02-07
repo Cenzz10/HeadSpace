@@ -221,6 +221,10 @@ const checkoutForm = document.getElementById('checkoutForm');
 const backToCartBtn = document.getElementById('backToCartBtn');
 const summaryTotalItems = document.getElementById('summaryTotalItems');
 const summaryTotalPrice = document.getElementById('summaryTotalPrice');
+const paymentMethodSelect = document.getElementById('paymentMethod');
+const qrisSection = document.getElementById('qrisSection');
+const paymentProofInput = document.getElementById('paymentProof');
+const filePreview = document.getElementById('filePreview');
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
@@ -242,6 +246,12 @@ document.addEventListener('DOMContentLoaded', function() {
     priceFilter.addEventListener('change', filterProducts);
     stockFilter.addEventListener('change', filterProducts);
     searchInput.addEventListener('input', filterProducts);
+    
+    // Event listener untuk payment method change
+    paymentMethodSelect.addEventListener('change', handlePaymentMethodChange);
+    
+    // Event listener untuk file upload
+    paymentProofInput.addEventListener('change', handleFileUpload);
     
     // Close modal when clicking outside
     cartModal.addEventListener('click', function(e) {
@@ -276,6 +286,99 @@ function setupSocialLinks() {
             icon.target = '_blank';
         }
     });
+}
+
+// Handle payment method change
+function handlePaymentMethodChange() {
+    const selectedMethod = paymentMethodSelect.value;
+    
+    if (selectedMethod === 'Qris') {
+        qrisSection.style.display = 'block';
+    } else {
+        qrisSection.style.display = 'none';
+    }
+}
+
+// Handle file upload
+function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        showNotification('Ukuran file terlalu besar. Maksimal 5MB.', 'error');
+        paymentProofInput.value = '';
+        return;
+    }
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+        showNotification('Format file tidak didukung. Gunakan JPG, PNG, atau PDF.', 'error');
+        paymentProofInput.value = '';
+        return;
+    }
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const fileContent = e.target.result;
+        let previewHTML = '';
+        
+        if (file.type.includes('image')) {
+            previewHTML = `
+                <div class="file-preview-content">
+                    <div class="file-preview-icon">
+                        <i class="fas fa-file-image"></i>
+                    </div>
+                    <div class="file-preview-info">
+                        <div class="file-preview-name">${file.name}</div>
+                        <div class="file-preview-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button type="button" class="file-preview-remove" onclick="removeFilePreview()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <img src="${fileContent}" alt="Preview" style="max-width: 100%; margin-top: 10px; border-radius: 8px;">
+            `;
+        } else {
+            previewHTML = `
+                <div class="file-preview-content">
+                    <div class="file-preview-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="file-preview-info">
+                        <div class="file-preview-name">${file.name}</div>
+                        <div class="file-preview-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button type="button" class="file-preview-remove" onclick="removeFilePreview()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        }
+        
+        filePreview.innerHTML = previewHTML;
+        filePreview.classList.add('active');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// Remove file preview
+function removeFilePreview() {
+    filePreview.innerHTML = '';
+    filePreview.classList.remove('active');
+    paymentProofInput.value = '';
+}
+
+// Format file size
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 // Render products to the page
@@ -745,6 +848,11 @@ function goToPayment() {
         return;
     }
     
+    // Reset form fields
+    checkoutForm.reset();
+    removeFilePreview();
+    qrisSection.style.display = 'none';
+    
     // Buka modal checkout
     openCheckoutModal();
 }
@@ -794,11 +902,31 @@ function submitCheckoutForm(e) {
     const customerPhone = document.getElementById('customerPhone').value;
     const customerAddress = document.getElementById('customerAddress').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
+    const paymentProof = document.getElementById('paymentProof').files[0];
     const orderNotes = document.getElementById('orderNotes').value;
     
     // Validasi form
     if (!customerName || !customerPhone || !customerAddress || !paymentMethod) {
         showNotification('Harap lengkapi semua data yang diperlukan!', 'error');
+        return;
+    }
+    
+    // Validasi bukti pembayaran
+    if (!paymentProof) {
+        showNotification('Harap upload bukti pembayaran!', 'error');
+        return;
+    }
+    
+    // Validasi file size (max 5MB)
+    if (paymentProof.size > 5 * 1024 * 1024) {
+        showNotification('Ukuran file bukti pembayaran terlalu besar. Maksimal 5MB.', 'error');
+        return;
+    }
+    
+    // Validasi file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (!validTypes.includes(paymentProof.type)) {
+        showNotification('Format file bukti pembayaran tidak didukung. Gunakan JPG, PNG, atau PDF.', 'error');
         return;
     }
     
@@ -822,6 +950,8 @@ function submitCheckoutForm(e) {
     
     // Reset form
     checkoutForm.reset();
+    removeFilePreview();
+    qrisSection.style.display = 'none';
     
     // Tutup modal
     closeCheckoutModalHandler();
@@ -882,7 +1012,9 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
     message += `*DATA PEMESAN:*\n`;
     message += `- Nama: ${name}\n`;
     message += `- WhatsApp: ${phone}\n`;
-    message += `- Alamat: ${address}\n\n`;
+    message += `- Alamat: ${address}\n`;
+    message += `- Metode Pembayaran: ${paymentMethod}\n`;
+    message += `- Bukti Pembayaran: TELAH DIUPLOAD\n\n`;
     
     message += `*DETAIL PESANAN:*\n`;
     message += `═════════════════════════\n`;
@@ -896,15 +1028,14 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
     
     message += `*RINCIAN PEMBAYARAN:*\n`;
     message += `- Total Item: ${totalItems} pcs\n`;
-    message += `- Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n`;
-    message += `- Metode Bayar: ${paymentMethod}\n\n`;
+    message += `- Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n\n`;
     
     if (notes) {
         message += `*CATATAN PESANAN:*\n${notes}\n\n`;
     }
     
     message += `- Waktu Pesan: ${orderDate}\n`;
-    message += `\n_Saya sudah memesan dari website HeadSpace dan ingin melanjutkan pembayaran._\n`;
+    message += `\n_Saya sudah memesan dari website HeadSpace dan mengupload bukti pembayaran._\n`;
     message += `\nTerima kasih!`;
     
     return message;

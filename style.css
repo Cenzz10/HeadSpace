@@ -1188,3 +1188,196 @@ footer {
         padding: 0.8rem 1rem;
     }
 }
+
+/* Tambahkan kode ini di akhir file CSS yang sudah ada */
+
+/* QRIS Section */
+.qris-section {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
+    padding: 0.8rem;
+    border-radius: 10px;
+    border: 2px solid var(--secondary-blue);
+    margin-top: 0.8rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.qris-container {
+    display: flex;
+    gap: 0.1rem;
+    width: 200px;
+    height: 400px;
+}
+
+.qris-image {
+    width: 300px;
+    height: 400px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 2px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+/* File Upload Styles */
+.file-upload-container {
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+    border: 2px dashed var(--secondary-blue);
+    border-radius: var(--border-radius);
+    background-color: rgba(59, 130, 246, 0.05);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.file-upload-label:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: var(--accent-blue);
+}
+
+.file-upload-label i {
+    font-size: 2.5rem;
+    color: var(--secondary-blue);
+    margin-bottom: 1rem;
+}
+
+.file-upload-label span {
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.file-upload-hint {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+}
+
+#paymentProof {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background-color: var(--light-blue);
+    border: 1px solid #e2e8f0;
+    display: none;
+}
+
+.file-preview.active {
+    display: block;
+}
+
+.file-preview-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-preview-icon {
+    font-size: 2rem;
+    color: var(--secondary-blue);
+}
+
+.file-preview-info {
+    flex-grow: 1;
+}
+
+.file-preview-name {
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.3rem;
+    word-break: break-all;
+}
+
+.file-preview-size {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.file-preview-remove {
+    background: none;
+    border: none;
+    color: var(--error-red);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+
+.file-preview-remove:hover {
+    transform: scale(1.2);
+}
+
+/* Payment method note */
+.payment-note {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.3rem;
+    font-style: italic;
+}
+
+/* Responsive adjustments for QRIS */
+@media (max-width: 480px) {
+    .qris-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.8rem;
+    }
+
+    .qris-image {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .file-upload-label {
+        padding: 2rem 1rem;
+    }
+    
+    .file-upload-label i {
+        font-size: 2rem;
+    }
+    
+    .file-upload-label span {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .qris-image {
+        max-width: 180px;
+    }
+    
+    .file-upload-label {
+        padding: 1.5rem 1rem;
+    }
+    
+    .file-preview-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .file-preview-remove {
+        margin-top: 0.5rem;
+    }
+}
