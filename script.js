@@ -1024,7 +1024,7 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
         message += `   ├ Harga: Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}\n`;
         message += `   └ Subtotal: Rp ${(item.price * item.quantity).toLocaleString('id-ID')}\n\n`;
     });
-    message += `══════════════════════════\n\n`;
+    message += `═════════════════════════\n\n`;
     
     message += `*RINCIAN PEMBAYARAN:*\n`;
     message += `- Total Item: ${totalItems} pcs\n`;
@@ -1034,7 +1034,7 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
         message += `*CATATAN PESANAN:*\n${notes}\n\n`;
     }
     
-    message += `- Waktu Pesan: ${orderDate}\n`;
+    message += `Waktu Pesan: ${orderDate}\n`;
     message += `\n_Saya sudah memesan dari website HeadSpace dan mengupload bukti pembayaran._\n`;
     message += `\nTerima kasih!`;
     

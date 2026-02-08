@@ -1220,6 +1220,11 @@ footer {
     margin: 0 auto;
 }
 
+#qrisSection img {
+    width: 300px;;
+    height: 400px;
+}
+
 /* File Upload Styles */
 .file-upload-container {
     position: relative;
@@ -1336,48 +1341,49 @@ footer {
 }
 
 /* Responsive adjustments for QRIS */
-@media (max-width: 480px) {
-    .qris-container {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.8rem;
+@media (max-width: 768px) {
+    .qris-section {
+        padding: 0.8rem;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .qris-image {
+        width: 200px;
+        height: 400px;
     }
 
-    .qris-image {
-        width: 110px;
-        height: 110px;
-    }
-    
-    .file-upload-label {
-        padding: 2rem 1rem;
-    }
-    
-    .file-upload-label i {
-        font-size: 2rem;
-    }
-    
-    .file-upload-label span {
-        font-size: 1rem;
+    #qrisSection img {
+        width: 200px;
+        height: 400px;
     }
 }
 
 @media (max-width: 480px) {
+    .qris-section {
+        padding: 0.6rem;
+    }
+    
     .qris-image {
-        max-width: 180px;
+        width: 200px;
+        height: 400px;
+        padding: 3px;
+    }
+
+    #qrisSection img {
+        width: 200px;
+        height: 400px;
+    }
+}
+
+@media (max-width: 360px) {
+    .qris-image {
+        width: 220px;
+        height: 400px;
     }
     
-    .file-upload-label {
-        padding: 1.5rem 1rem;
-    }
-    
-    .file-preview-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
-    }
-    
-    .file-preview-remove {
-        margin-top: 0.5rem;
+    #qrisSection img {
+        width: 220px;
+        height: 400px;
     }
 }
