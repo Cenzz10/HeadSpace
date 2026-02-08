@@ -16,7 +16,7 @@ const products = [
         price: 44000,
         image: "images/topicewe2.jpeg",
         description: "Flat cap berwarna biru berbahan halus.",
-        stock: "ready"
+        stock: "soldout"
     },
     {
         id: 3,
@@ -25,7 +25,7 @@ const products = [
         price: 48000,
         image: "images/topicewe3.jpeg",
         description: "Flat cap berwarna coklat dengan pita coklat tua di bawahnya.",
-        stock: "soldout"
+        stock: "ready"
     },
     {
         id: 4,
@@ -43,7 +43,7 @@ const products = [
         price: 47000,
         image: "images/topicewe5.jpeg",
         description: "Topi putih dengan hiasan jaring dan manikmanik serta pita dibawahnya.",
-        stock: "soldout"
+        stock: "ready"
     },
     {
         id: 6,
@@ -70,7 +70,7 @@ const products = [
         price: 30000,
         image: "images/topicewe8.jpeg",
         description: "Topi denim dengan detail pita dan renda. Kesan girly dan unik.",
-        stock: "soldout"
+        stock: "ready"
     },
     {
         id: 9,
@@ -88,7 +88,7 @@ const products = [
         price: 27000,
         image: "images/topicewe10.jpeg",
         description: "Topi motif kotak biru pastel dengan bordir pita. Tampilan manis dan feminin.",
-        stock: "ready"
+        stock: "soldout"
     },
     {
         id: 11,
@@ -115,7 +115,7 @@ const products = [
         price: 30000,
         image: "images/topilaki3.jpeg",
         description: "Flat cap hitam metalic.",
-        stock: "ready"
+        stock: "soldout"
     },
     {
         id: 14,
@@ -178,7 +178,7 @@ const products = [
         price: 36000,
         image: "images/topilaki10.jpeg",
         description: "topi berwarna cream dengan tulisan New York di depannya.",
-        stock: "ready"
+        stock: "soldout"
     },
 ];
 
@@ -1010,6 +1010,7 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
     
     let message = `*PESANAN DARI WEBSITE HEADSPACE*\n\n`;
     message += `*DATA PEMESAN:*\n`;
+    message += `═════════════════════════\n`;
     message += `- Nama: ${name}\n`;
     message += `- WhatsApp: ${phone}\n`;
     message += `- Alamat: ${address}\n`;
@@ -1024,9 +1025,9 @@ function generateWhatsAppMessage(name, phone, address, paymentMethod, notes) {
         message += `   ├ Harga: Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}\n`;
         message += `   └ Subtotal: Rp ${(item.price * item.quantity).toLocaleString('id-ID')}\n\n`;
     });
-    message += `═════════════════════════\n\n`;
     
     message += `*RINCIAN PEMBAYARAN:*\n`;
+    message += `═════════════════════════\n`;
     message += `- Total Item: ${totalItems} pcs\n`;
     message += `- Total Harga: Rp ${totalPrice.toLocaleString('id-ID')}\n\n`;
     
