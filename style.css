@@ -1378,12 +1378,12 @@ footer {
 
 @media (max-width: 360px) {
     .qris-image {
-        width: 220px;
+        width: 300px;
         height: 400px;
     }
     
     #qrisSection img {
-        width: 220px;
+        width: 300px;
         height: 400px;
     }
 }
